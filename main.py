@@ -65,7 +65,7 @@ def calc_star_from_exp(exp: int) -> int:
     return level
 
 
-@register("astrbot_plugin_hypixel_api", "AstrBot-Plugin-Dev", "Hypixel 玩家数据查询插件", "1.0.0")
+@register("astrbot_plugin_hypixel_api", "bi_xiaoyang2", "Hypixel 玩家数据查询插件", "1.0.0")
 class HypixelPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
