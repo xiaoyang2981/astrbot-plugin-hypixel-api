@@ -1,0 +1,9 @@
+{
+  "api_key": {
+    "description": "Hypixel API Key",
+    "type": "string",
+    "hint": "前往 https://developer.hypixel.net/ 获取",
+    "obvious_hint": true,
+    "default": ""
+  }
+}

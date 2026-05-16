@@ -1,29 +1,11 @@
-import os
-import json
-import asyncio
 from datetime import datetime, timezone
 
 from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
-from astrbot.api import logger
+from astrbot.api import logger, AstrBotConfig
 from astrbot.api.message_components import *
 
 from .hypixel_client import HypixelClient
-
-
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.json")
-
-
-def load_config() -> dict:
-    if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-
-def save_config(config: dict):
-    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump(config, f, ensure_ascii=False, indent=2)
 
 
 def calc_fkdr(final_kills: int, final_deaths: int) -> str:
@@ -67,12 +49,12 @@ def calc_star_from_exp(exp: int) -> int:
 
 @register("astrbot_plugin_hypixel_api", "bi_xiaoyang2", "Hypixel 玩家数据查询插件", "1.0.0")
 class HypixelPlugin(Star):
-    def __init__(self, context: Context):
+    def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
+        self.config = config
 
     async def initialize(self):
-        config = load_config()
-        api_key = config.get("api_key", "")
+        api_key = self.config.get("api_key", "")
         if api_key:
             self.client = HypixelClient(api_key)
             logger.info("Hypixel API 客户端已初始化")
@@ -108,9 +90,8 @@ class HypixelPlugin(Star):
             if not arg:
                 yield event.plain_result("请输入 API 密钥: /hypixel setkey <key>")
                 return
-            config = load_config()
-            config["api_key"] = arg
-            save_config(config)
+            self.config["api_key"] = arg
+            self.config.save_config()
             self.client = HypixelClient(arg)
             yield event.plain_result("Hypixel API Key 已设置并保存!")
             return
