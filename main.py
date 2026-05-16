@@ -6,14 +6,14 @@ from astrbot.api.message_components import *
 from .hypixel import HypixelClient
 from .bjd import BuGLandClient
 
-import commands.player as player_cmd
-import commands.bedwars as bedwars_cmd
-import commands.skywars as skywars_cmd
-import commands.arcade as arcade_cmd
-import commands.zombies as zombies_cmd
-import commands.party as party_cmd
-import commands.bjd_blitz as blitz_cmd
-import commands.bjd_game as bjd_game_cmd
+from commands import player as player_cmd
+from commands import bedwars as bedwars_cmd
+from commands import skywars as skywars_cmd
+from commands import arcade as arcade_cmd
+from commands import zombies as zombies_cmd
+from commands import party as party_cmd
+from commands import bjd_blitz as blitz_cmd
+from commands import bjd_game as bjd_game_cmd
 
 
 @register("astrbot_plugin_hypixel_api", "bi_xiaoyang2", "Hypixel + BuGLand 数据查询插件", "1.0.0")
