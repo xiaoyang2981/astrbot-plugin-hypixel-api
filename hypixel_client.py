@@ -124,10 +124,21 @@ class HypixelClient:
         if not player:
             raise Exception("Player not found")
 
-        rank = player.get("rank", "NONE")
+        raw_rank = player.get("rank", "NONE")
+        new_pkg = player.get("newPackageRank", "")
+        pkg = player.get("packageRank", "")
+        monthly = player.get("monthlyPackageRank", "NONE")
+
+        rank = raw_rank
+        if rank in ("NORMAL", "NONE") and new_pkg:
+            rank = new_pkg
+        if rank in ("NORMAL", "NONE") and pkg:
+            rank = pkg
+        if monthly == "SUPERSTAR":
+            rank = "MVP++"
+
         prefix = player.get("prefix", "")
-        mvp_plus_color = player.get("monthlyPackageRank", "NONE")
-        rank_plus = player.get("rankPlusColor", "RED")
+        mvp_plus_color = player.get("rankPlusColor", "RED")
 
         return {
             "display_name": player.get("displayname", "Unknown"),
@@ -135,7 +146,6 @@ class HypixelClient:
             "rank": rank,
             "prefix": prefix,
             "mvp_plus_color": mvp_plus_color,
-            "rank_plus_color": rank_plus,
             "first_login": player.get("firstLogin", 0),
             "last_login": player.get("lastLogin", 0),
             "last_logout": player.get("lastLogout", 0),

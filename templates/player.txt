@@ -1,0 +1,15 @@
+━━━━ 玩家信息 ━━━━
+
+  {display_name}  —  Lv.{level}
+
+━━━━━━━━━━━━━━━━
+
+  UUID   │ {uuid}
+  Rank   │ {rank}
+  Karma  │ {karma}
+  语言    │ {language}
+
+━━━━━━━━━━━━━━━━
+
+  首次登录  {first_login}
+  最近活跃  {last_login}
