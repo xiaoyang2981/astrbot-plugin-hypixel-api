@@ -4,13 +4,9 @@ from astrbot.api import logger, AstrBotConfig
 from astrbot.api.message_components import *
 
 from .hypixel import HypixelClient
+from .hypixel.command import player, bedwars, skywars, arcade, zombies, party
 from .bjd import BuGLandClient
-
-from .commands import (
-    player as player_cmd, bedwars as bedwars_cmd, skywars as skywars_cmd,
-    arcade as arcade_cmd, zombies as zombies_cmd, party as party_cmd,
-    bjd_blitz as blitz_cmd, bjd_game as bjd_game_cmd,
-)
+from .bjd.command import blitz as bjd_blitz, gamestats as bjd_gamestats
 
 
 @register("astrbot_plugin_hypixel_api", "bi_xiaoyang2", "Hypixel + BuGLand 数据查询插件", "1.0.0")
@@ -46,11 +42,8 @@ class HypixelPlugin(Star):
         logger.info(f"查询 {sub} {arg} — {ctx}")
 
     async def _exec_hyp(self, event, sub, arg):
-        HYPHANDLERS = {
-            "player": player_cmd.handle, "bedwars": bedwars_cmd.handle,
-            "skywars": skywars_cmd.handle, "arcade": arcade_cmd.handle,
-            "zombies": zombies_cmd.handle, "party": party_cmd.handle,
-        }
+        HYPH = {"player": player, "bedwars": bedwars, "skywars": skywars,
+                "arcade": arcade, "zombies": zombies, "party": party}
         if sub == "blitz":
             if not self.bjd:
                 yield event.plain_result("BuGLand Token 未配置"); return
@@ -58,13 +51,13 @@ class HypixelPlugin(Star):
                 yield event.plain_result("请输入玩家ID"); return
             self._log(event, sub, arg)
             try:
-                yield event.plain_result(await blitz_cmd.handle(self.bjd, arg))
+                yield event.plain_result(await bjd_blitz(self.bjd, arg))
             except Exception as e:
                 logger.info(f"布吉岛 {arg} 失败: {e}")
                 yield event.plain_result(f"获取布吉岛数据失败: {e}")
             return
 
-        h = HYPHANDLERS.get(sub)
+        h = HYPH.get(sub)
         if not h:
             yield event.plain_result(f"未知命令: {sub}"); return
         if not self.client:
@@ -85,12 +78,10 @@ class HypixelPlugin(Star):
             return
         msg = event.message_str.strip()
         parts = msg.split(maxsplit=2)
-        cmd = parts[0].lstrip("/")
 
         if len(parts) < 2:
             yield event.plain_result(
-                "📊 Hypixel 数据查询\n\n"
-                "📋 用法:\n"
+                "📊 Hypixel 数据查询\n\n📋 用法:\n"
                 "  🔍 /hyp player <ID>   - 玩家基本信息\n"
                 "  🛏️ /hyp bedwars <ID>  - 起床战争数据\n"
                 "  🌌 /hyp skywars <ID>  - 空岛战争数据\n"
@@ -99,8 +90,7 @@ class HypixelPlugin(Star):
                 "  🎉 /hyp party <ID>    - 小游戏派对数据\n"
                 "  ⚔️ /hyp blitz <ID>    - 布吉岛数据\n"
                 "  🔑 /hyp setkey <key>  - 设置 Hypixel API Key\n"
-                "  🔑 /hyp bjdkey <key>  - 设置 BuGLand Token\n\n"
-                "💡 也可用 /hypixel 或 /hyp"
+                "  🔑 /hyp bjdkey <key>  - 设置 BuGLand Token"
             )
             return
 
@@ -136,14 +126,12 @@ class HypixelPlugin(Star):
 
         if len(parts) < 2:
             yield event.plain_result(
-                "⚔️ BuGLand 布吉岛查询\n\n"
-                "📋 用法:\n"
+                "⚔️ BuGLand 布吉岛查询\n\n📋 用法:\n"
                 "  ⚔️ /bjd blitz <ID>    - 布吉岛 Blitz\n"
                 "  🛏️ /bjd bedwars <ID>  - 起床战争\n"
                 "  🌌 /bjd skywars <ID>  - 空岛战争\n"
                 "  🔍 /bjd player <ID>   - 玩家信息\n"
-                "  🔑 /bjd setkey <key>  - 设置 Token\n\n"
-                "💡 也支持 /bjd <game> <ID>，game 可以是: bedwars, skywars, blitz, thebridges, murder, arcade"
+                "  🔑 /bjd setkey <key>  - 设置 Token"
             )
             return
 
@@ -176,8 +164,10 @@ class HypixelPlugin(Star):
                     f"🏅 排名 → {p.get('rank', 'N/A')}\n"
                     f"🎮 游戏数 → {p.get('games', 0)}"
                 )
+            elif sub == "blitz":
+                text = await bjd_blitz(self.bjd, arg)
             else:
-                text = await bjd_game_cmd.handle(self.bjd, sub, arg)
+                text = await bjd_gamestats(self.bjd, sub, arg)
             yield event.plain_result(text)
         except Exception as e:
             logger.info(f"BJD {sub} {arg} 失败: {e}")
