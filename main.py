@@ -72,8 +72,16 @@ class HypixelPlugin(Star):
             yield event.plain_result(f"获取数据失败: {e}")
 
     @filter.command("hypixel")
-    @filter.command("hyp")
     async def hypixel(self, event: AstrMessageEvent):
+        async for r in self._handle_hyp(event):
+            yield r
+
+    @filter.command("hyp")
+    async def hyp(self, event: AstrMessageEvent):
+        async for r in self._handle_hyp(event):
+            yield r
+
+    async def _handle_hyp(self, event: AstrMessageEvent):
         if self._is_banned(event):
             return
         msg = event.message_str.strip()
