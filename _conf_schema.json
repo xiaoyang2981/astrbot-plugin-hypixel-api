@@ -6,13 +6,6 @@
     "obvious_hint": true,
     "default": ""
   },
-  "render_mode": {
-    "description": "输出模式",
-    "type": "string",
-    "hint": "auto: 优先图片渲染，失败降级纯文本 | text: 始终纯文本输出",
-    "default": "auto",
-    "options": ["auto", "text"]
-  },
   "ban_groups": {
     "description": "黑名单群组（群号列表）",
     "type": "list",
