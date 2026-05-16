@@ -6,6 +6,13 @@
     "obvious_hint": true,
     "default": ""
   },
+  "bjd_token": {
+    "description": "BuGLand (布吉岛) Token",
+    "type": "string",
+    "hint": "在大厅输入 /openapi 自助申领",
+    "obvious_hint": true,
+    "default": ""
+  },
   "ban_groups": {
     "description": "黑名单群组（群号列表）",
     "type": "list",

@@ -1,3 +1,3 @@
-from .blitz import get_stats
+from .client import BuGLandClient
 
-__all__ = ["get_stats"]
+__all__ = ["BuGLandClient"]
