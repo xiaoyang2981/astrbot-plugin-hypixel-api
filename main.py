@@ -65,15 +65,15 @@ class HypixelPlugin(Star):
 
         if len(parts) < 2:
             yield event.plain_result(
-                "Hypixel 数据查询插件\n\n"
-                "用法:\n"
-                "  /hypixel player <ID>   - 玩家基本信息\n"
-                "  /hypixel bedwars <ID>  - 起床战争数据\n"
-                "  /hypixel skywars <ID>  - 空岛战争数据\n"
-                "  /hypixel arcade <ID>   - 街机游戏总览\n"
-                "  /hypixel zombies <ID>  - 丧尸末日数据\n"
-                "  /hypixel party <ID>    - 小游戏派对数据\n"
-                "  /hypixel setkey <key>  - 设置 API Key"
+                "📊 Hypixel 数据查询插件\n\n"
+                "📋 用法:\n"
+                "  🔍 /hypixel player <ID>   - 玩家基本信息\n"
+                "  🛏️ /hypixel bedwars <ID>  - 起床战争数据\n"
+                "  🌌 /hypixel skywars <ID>  - 空岛战争数据\n"
+                "  🕹️ /hypixel arcade <ID>   - 街机游戏总览\n"
+                "  🧟 /hypixel zombies <ID>  - 丧尸末日数据\n"
+                "  🎉 /hypixel party <ID>    - 小游戏派对数据\n"
+                "  🔑 /hypixel setkey <key>  - 设置 API Key"
             )
             return
 
@@ -116,16 +116,16 @@ class HypixelPlugin(Star):
             yield event.plain_result(f"获取玩家信息失败: {e}"); return
         level = calc_network_level(info.get("network_level", 0))
         yield event.plain_result(
-            f"━━━━ 玩家信息 ━━━━\n\n"
-            f"  {info['display_name']}  —  Lv.{level}\n\n"
+            f"━━━━ 🔍 玩家信息 ━━━━\n\n"
+            f"  👤 {info['display_name']}  ─  Lv.{level}\n\n"
             f"━━━━━━━━━━━━━━━━\n\n"
-            f"  UUID   │ {info['uuid']}\n"
-            f"  Rank   │ {info.get('rank', 'NONE')}\n"
-            f"  Karma  │ {fmt_num(info.get('karma', 0))}\n"
-            f"  语言    │ {info.get('language', 'N/A')}\n\n"
+            f"  🆔 UUID    │ {info['uuid']}\n"
+            f"  ⭐ Rank    │ {info.get('rank', 'NONE')}\n"
+            f"  💎 Karma   │ {fmt_num(info.get('karma', 0))}\n"
+            f"  🌐 语言     │ {info.get('language', 'N/A')}\n\n"
             f"━━━━━━━━━━━━━━━━\n\n"
-            f"  首次登录  {ts_to_str(info.get('first_login', 0))}\n"
-            f"  最近活跃  {ts_to_str(info.get('last_login', 0))}"
+            f"  🕐 首次登录  {ts_to_str(info.get('first_login', 0))}\n"
+            f"  🕐 最近活跃  {ts_to_str(info.get('last_login', 0))}"
         )
 
     async def _handle_bedwars(self, event, name):
@@ -140,19 +140,19 @@ class HypixelPlugin(Star):
         kdr = calc_kdr(bw["kills"], bw["deaths"])
         wlr = calc_wlr(bw["wins"], bw["losses"])
         yield event.plain_result(
-            f"━━━━ 起床战争 ━━━━\n\n"
-            f"  {bw['display_name']}\n\n"
+            f"━━━━ 🛏️ 起床战争 ━━━━\n\n"
+            f"  👤 {bw['display_name']}\n\n"
             f"━━━━━━━━━━━━━━━━\n\n"
-            f"  等级    │ {fmt_num(bw['level'])}          硬币  │ {fmt_num(bw['coins'])}\n"
-            f"  胜场    │ {fmt_num(bw['wins'])}          败场  │ {fmt_num(bw['losses'])}\n"
-            f"  W/L    │ {wlr}\n\n"
-            f"  击杀    │ {fmt_num(bw['kills'])}          死亡  │ {fmt_num(bw['deaths'])}\n"
-            f"  K/D    │ {kdr}\n\n"
-            f"  最终击杀 │ {fmt_num(bw['final_kills'])}        最终死亡 │ {fmt_num(bw['final_deaths'])}\n"
-            f"  FKDR   │ {fkdr}\n\n"
-            f"  拆床    │ {fmt_num(bw['beds_broken'])}          丢床  │ {fmt_num(bw['beds_lost'])}\n"
-            f"  连胜    │ {bw['winstreak']}\n"
-            f"  总场次  │ {fmt_num(bw['games_played'])}"
+            f"  📊 等级  │ {fmt_num(bw['level'])}           🪙 硬币  │ {fmt_num(bw['coins'])}\n"
+            f"  🏆 胜场  │ {fmt_num(bw['wins'])}           💔 败场  │ {fmt_num(bw['losses'])}\n"
+            f"  📈 W/L  │ {wlr}\n\n"
+            f"  ⚔️ 击杀  │ {fmt_num(bw['kills'])}           💀 死亡  │ {fmt_num(bw['deaths'])}\n"
+            f"  📊 K/D  │ {kdr}\n\n"
+            f"  🔥 最终击杀 │ {fmt_num(bw['final_kills'])}         💀 最终死亡 │ {fmt_num(bw['final_deaths'])}\n"
+            f"  📈 FKDR   │ {fkdr}\n\n"
+            f"  🛏️ 拆床   │ {fmt_num(bw['beds_broken'])}           💤 丢床  │ {fmt_num(bw['beds_lost'])}\n"
+            f"  🔥 连胜   │ {bw['winstreak']}\n"
+            f"  🎮 总场次 │ {fmt_num(bw['games_played'])}"
         )
 
     async def _handle_skywars(self, event, name):
@@ -165,16 +165,15 @@ class HypixelPlugin(Star):
             yield event.plain_result(f"获取空岛战争数据失败: {e}"); return
         kdr = calc_kdr(sw["kills"], sw["deaths"]); wlr = calc_wlr(sw["wins"], sw["losses"])
         yield event.plain_result(
-            f"━━━━ 空岛战争 ━━━━\n\n"
-            f"  {sw['display_name']}  —  Lv.{sw['level']}\n\n"
+            f"━━━━ 🌌 空岛战争 ━━━━\n\n"
+            f"  👤 {sw['display_name']}  ─  Lv.{sw['level']}\n\n"
             f"━━━━━━━━━━━━━━━━\n\n"
-            f"  胜场    │ {fmt_num(sw['wins'])}          败场  │ {fmt_num(sw['losses'])}\n"
-            f"  W/L    │ {wlr}\n\n"
-            f"  击杀    │ {fmt_num(sw['kills'])}          死亡  │ {fmt_num(sw['deaths'])}\n"
-            f"  K/D    │ {kdr}\n\n"
-            f"  Souls  │ {fmt_num(sw['souls'])}          Heads │ {fmt_num(sw['heads'])}\n"
-            f"  总场次  │ {fmt_num(sw['games_played'])}\n"
-            f"  硬币    │ {fmt_num(sw['coins'])}"
+            f"  🏆 胜场  │ {fmt_num(sw['wins'])}           💔 败场  │ {fmt_num(sw['losses'])}\n"
+            f"  📈 W/L  │ {wlr}\n\n"
+            f"  ⚔️ 击杀  │ {fmt_num(sw['kills'])}           💀 死亡  │ {fmt_num(sw['deaths'])}\n"
+            f"  📊 K/D  │ {kdr}\n\n"
+            f"  💜 Souls │ {fmt_num(sw['souls'])}          👤 Heads │ {fmt_num(sw['heads'])}\n"
+            f"  🎮 总场次│ {fmt_num(sw['games_played'])}  🪙 硬币  │ {fmt_num(sw['coins'])}"
         )
 
     async def _handle_arcade(self, event, name):
@@ -186,15 +185,15 @@ class HypixelPlugin(Star):
             logger.info(f"街机 {name} 失败: {e}")
             yield event.plain_result(f"获取街机数据失败: {e}"); return
         msg = (
-            f"━━━━ 街机游戏 ━━━━\n\n"
-            f"  {arc['display_name']}\n\n"
+            f"━━━━ 🕹️ 街机游戏 ━━━━\n\n"
+            f"  👤 {arc['display_name']}\n\n"
             f"━━━━━━━━━━━━━━━━\n\n"
-            f"  总胜场  │ {fmt_num(arc['wins'])}\n"
-            f"  总回合  │ {fmt_num(arc['rounds_played'])}\n"
-            f"  硬币    │ {fmt_num(arc['coins'])}\n\n"
+            f"  🏆 总胜场  │ {fmt_num(arc['wins'])}\n"
+            f"  🔄 总回合  │ {fmt_num(arc['rounds_played'])}\n"
+            f"  🪙 硬币    │ {fmt_num(arc['coins'])}\n\n"
         )
         if arc["top_games"]:
-            msg += "热门小游戏:\n" + "\n".join(f"  └ {g}  —  {w} 胜" for g, w in arc["top_games"][:5])
+            msg += "🏆 热门小游戏:\n" + "\n".join(f"  🎮 {g}  →  {w} 胜" for g, w in arc["top_games"][:5])
         yield event.plain_result(msg)
 
     async def _handle_zombies(self, event, name):
@@ -207,20 +206,20 @@ class HypixelPlugin(Star):
             yield event.plain_result(f"获取丧尸末日数据失败: {e}"); return
         kdr = calc_kdr(z["kills"], z["deaths"]); wlr = calc_wlr(z["wins"], z["losses"])
         msg = (
-            f"━━━━ 丧尸末日 ━━━━\n\n"
-            f"  {z['display_name']}\n\n"
+            f"━━━━ 🧟 丧尸末日 ━━━━\n\n"
+            f"  👤 {z['display_name']}\n\n"
             f"━━━━━━━━━━━━━━━━\n\n"
-            f"  场次    │ {fmt_num(z['games_played'])}\n"
-            f"  胜场    │ {fmt_num(z['wins'])}          败场  │ {fmt_num(z['losses'])}\n"
-            f"  W/L    │ {wlr}\n\n"
-            f"  击杀    │ {fmt_num(z['kills'])}          死亡  │ {fmt_num(z['deaths'])}\n"
-            f"  K/D    │ {kdr}\n"
-            f"  爆头    │ {fmt_num(z['headshots'])}\n\n"
-            f"  开门    │ {fmt_num(z['doors_opened'])}         开箱  │ {fmt_num(z['chests_looted'])}\n"
-            f"  生存回合 │ {fmt_num(z['rounds_survived'])}        最佳  │ {z['best_round']}\n\n"
+            f"  🎮 场次   │ {fmt_num(z['games_played'])}\n"
+            f"  🏆 胜场   │ {fmt_num(z['wins'])}           💔 败场  │ {fmt_num(z['losses'])}\n"
+            f"  📈 W/L   │ {wlr}\n\n"
+            f"  ⚔️ 击杀   │ {fmt_num(z['kills'])}           💀 死亡  │ {fmt_num(z['deaths'])}\n"
+            f"  📊 K/D   │ {kdr}\n"
+            f"  🎯 爆头   │ {fmt_num(z['headshots'])}\n\n"
+            f"  🚪 开门   │ {fmt_num(z['doors_opened'])}          📦 开箱  │ {fmt_num(z['chests_looted'])}\n"
+            f"  🔄 生存回合│ {fmt_num(z['rounds_survived'])}        🏅 最佳  │ {z['best_round']}\n\n"
         )
         if z["maps"]:
-            msg += "地图记录:\n" + "\n".join(f"  └ {m}  —  最佳 {r} 回合" for m, r in z["maps"].items())
+            msg += "🗺️ 地图记录:\n" + "\n".join(f"  📍 {m}  →  最佳 {r} 回合" for m, r in z["maps"].items())
         yield event.plain_result(msg)
 
     async def _handle_party(self, event, name):
@@ -232,14 +231,14 @@ class HypixelPlugin(Star):
             logger.info(f"小游戏派对 {name} 失败: {e}")
             yield event.plain_result(f"获取小游戏派对数据失败: {e}"); return
         msg = (
-            f"━━━━ 小游戏派对 ━━━━\n\n"
-            f"  {p['display_name']}\n\n"
+            f"━━━━ 🎉 小游戏派对 ━━━━\n\n"
+            f"  👤 {p['display_name']}\n\n"
             f"━━━━━━━━━━━━━━━━\n\n"
-            f"  回合胜场  │ {fmt_num(p['round_wins'])}\n"
-            f"  总回合    │ {fmt_num(p['total_rounds'])}\n\n"
+            f"  🏆 回合胜场 │ {fmt_num(p['round_wins'])}\n"
+            f"  🔄 总回合   │ {fmt_num(p['total_rounds'])}\n\n"
         )
         if p["mini_games"]:
-            msg += "各小游戏胜场:\n" + "\n".join(f"  └ {g}  —  {w}" for g, w in p["mini_games"])
+            msg += "🎯 各小游戏胜场:\n" + "\n".join(f"  🎮 {g}  →  {w}" for g, w in p["mini_games"])
         yield event.plain_result(msg)
 
     async def terminate(self):
