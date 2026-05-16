@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 
-from .blitz import get_blitz_stats_from_player
+from .bjd import get_stats as get_blitz_stats_from_player
 
 
 BASE_URL = "https://api.hypixel.net/v2"

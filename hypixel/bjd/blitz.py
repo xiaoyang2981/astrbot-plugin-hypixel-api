@@ -1,4 +1,4 @@
-def get_blitz_stats_from_player(player: dict, display_name: str) -> dict:
+def get_stats(player: dict, display_name: str) -> dict:
     s = player.get("stats", {}).get("Blitz", {})
     return {
         "display_name": display_name,
