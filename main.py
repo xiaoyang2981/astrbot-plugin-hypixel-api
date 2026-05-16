@@ -47,26 +47,62 @@ class HypixelPlugin(Star):
         ctx = f"用户 {s}({u})" + (f" 在群 {g}" if g else "")
         logger.info(f"查询 {sub} {arg} — {ctx}")
 
+    async def _exec_hyp(self, event, sub, arg):
+        HYPHANDLERS = {
+            "player": player_cmd.handle, "bedwars": bedwars_cmd.handle,
+            "skywars": skywars_cmd.handle, "arcade": arcade_cmd.handle,
+            "zombies": zombies_cmd.handle, "party": party_cmd.handle,
+        }
+        if sub == "blitz":
+            if not self.bjd:
+                yield event.plain_result("BuGLand Token 未配置"); return
+            if not arg:
+                yield event.plain_result("请输入玩家ID"); return
+            self._log(event, sub, arg)
+            try:
+                yield event.plain_result(await blitz_cmd.handle(self.bjd, arg))
+            except Exception as e:
+                logger.info(f"布吉岛 {arg} 失败: {e}")
+                yield event.plain_result(f"获取布吉岛数据失败: {e}")
+            return
+
+        h = HYPHANDLERS.get(sub)
+        if not h:
+            yield event.plain_result(f"未知命令: {sub}"); return
+        if not self.client:
+            yield event.plain_result("Hypixel API Key 未配置"); return
+        if not arg:
+            yield event.plain_result(f"请输入玩家ID: /hyp {sub} <ID>"); return
+        self._log(event, sub, arg)
+        try:
+            yield event.plain_result(await h(self.client, arg))
+        except Exception as e:
+            logger.info(f"查询 {sub} {arg} 失败: {e}")
+            yield event.plain_result(f"获取数据失败: {e}")
+
     @filter.command("hypixel")
+    @filter.command("hyp")
     async def hypixel(self, event: AstrMessageEvent):
         if self._is_banned(event):
             return
         msg = event.message_str.strip()
         parts = msg.split(maxsplit=2)
+        cmd = parts[0].lstrip("/")
 
         if len(parts) < 2:
             yield event.plain_result(
-                "📊 Hypixel + BuGLand 数据查询\n\n"
+                "📊 Hypixel 数据查询\n\n"
                 "📋 用法:\n"
-                "  🔍 /hypixel player <ID>   - 玩家基本信息\n"
-                "  🛏️ /hypixel bedwars <ID>  - 起床战争数据\n"
-                "  🌌 /hypixel skywars <ID>  - 空岛战争数据\n"
-                "  🕹️ /hypixel arcade <ID>   - 街机游戏总览\n"
-                "  🧟 /hypixel zombies <ID>  - 丧尸末日数据\n"
-                "  🎉 /hypixel party <ID>    - 小游戏派对数据\n"
-                "  ⚔️ /hypixel blitz <ID>    - 布吉岛数据\n"
-                "  🔑 /hypixel setkey <key>  - 设置 Hypixel API Key\n"
-                "  🔑 /hypixel bjdkey <key>  - 设置 BuGLand Token"
+                "  🔍 /hyp player <ID>   - 玩家基本信息\n"
+                "  🛏️ /hyp bedwars <ID>  - 起床战争数据\n"
+                "  🌌 /hyp skywars <ID>  - 空岛战争数据\n"
+                "  🕹️ /hyp arcade <ID>   - 街机游戏总览\n"
+                "  🧟 /hyp zombies <ID>  - 丧尸末日数据\n"
+                "  🎉 /hyp party <ID>    - 小游戏派对数据\n"
+                "  ⚔️ /hyp blitz <ID>    - 布吉岛数据\n"
+                "  🔑 /hyp setkey <key>  - 设置 Hypixel API Key\n"
+                "  🔑 /hyp bjdkey <key>  - 设置 BuGLand Token\n\n"
+                "💡 也可用 /hypixel 或 /hyp"
             )
             return
 
@@ -90,43 +126,62 @@ class HypixelPlugin(Star):
             logger.info(f"BuGLand Token 已更新（{event.get_sender_id()}）")
             yield event.plain_result("BuGLand Token 已保存!"); return
 
-        HYPHANDLERS = {
-            "player": player_cmd.handle,
-            "bedwars": bedwars_cmd.handle,
-            "skywars": skywars_cmd.handle,
-            "arcade": arcade_cmd.handle,
-            "zombies": zombies_cmd.handle,
-            "party": party_cmd.handle,
-        }
-        if sub == "blitz":
-            if not self.bjd:
-                yield event.plain_result("BuGLand Token 未配置，请使用 /hypixel bjdkey <token> 设置")
-                return
-            if not arg:
-                yield event.plain_result("请输入玩家ID: /hypixel blitz <ID>"); return
-            self._log(event, sub, arg)
-            try:
-                text = await blitz_cmd.handle(self.bjd, arg)
-                yield event.plain_result(text)
-            except Exception as e:
-                logger.info(f"布吉岛 {arg} 失败: {e}")
-                yield event.plain_result(f"获取布吉岛数据失败: {e}")
+        async for r in self._exec_hyp(event, sub, arg):
+            yield r
+
+    @filter.command("bjd")
+    async def bjd_cmd(self, event: AstrMessageEvent):
+        if self._is_banned(event):
+            return
+        msg = event.message_str.strip()
+        parts = msg.split(maxsplit=2)
+
+        if len(parts) < 2:
+            yield event.plain_result(
+                "⚔️ BuGLand 布吉岛查询\n\n"
+                "📋 用法:\n"
+                "  ⚔️ /bjd blitz <ID>  - 布吉岛 Blitz 数据\n"
+                "  🔍 /bjd player <ID> - 布吉岛玩家信息\n"
+                "  🔑 /bjd setkey <key> - 设置 Token"
+            )
             return
 
-        h = HYPHANDLERS.get(sub)
-        if not h:
-            yield event.plain_result(f"未知命令: {sub}"); return
-        if not self.client:
-            yield event.plain_result("Hypixel API Key 未配置"); return
-        if not arg:
-            yield event.plain_result(f"请输入玩家ID: /hypixel {sub} <ID>"); return
+        sub, arg = parts[1], parts[2] if len(parts) > 2 else ""
 
+        if sub == "setkey":
+            if not arg:
+                yield event.plain_result("请输入 BuGLand Token"); return
+            self.config["bjd_token"] = arg
+            self.config.save_config()
+            self.bjd = BuGLandClient(arg)
+            logger.info(f"BuGLand Token 已更新（{event.get_sender_id()}）")
+            yield event.plain_result("BuGLand Token 已保存!"); return
+
+        if not self.bjd:
+            yield event.plain_result("BuGLand Token 未配置"); return
+        if not arg:
+            yield event.plain_result(f"请输入玩家ID: /bjd {sub} <ID>"); return
         self._log(event, sub, arg)
+
         try:
-            text = await h(self.client, arg)
+            if sub == "blitz":
+                text = await blitz_cmd.handle(self.bjd, arg)
+            elif sub == "player":
+                data = await self.bjd.get_player(arg)
+                p = data.get("data", data)
+                text = (
+                    f"━━━━ ⚔️ 布吉岛玩家 ━━━━\n"
+                    f"👤 玩家名 → {p.get('nickname', arg)}\n"
+                    f"✨ 等阶 → Lv.{p.get('level', '?')}\n"
+                    f"🏆 积分 → {p.get('points', 0)}\n"
+                    f"🏅 排名 → {p.get('rank', 'N/A')}\n"
+                    f"🎮 游戏数 → {p.get('games', 0)}"
+                )
+            else:
+                yield event.plain_result(f"未知命令: {sub}"); return
             yield event.plain_result(text)
         except Exception as e:
-            logger.info(f"查询 {sub} {arg} 失败: {e}")
+            logger.info(f"BJD {sub} {arg} 失败: {e}")
             yield event.plain_result(f"获取数据失败: {e}")
 
     async def terminate(self):
