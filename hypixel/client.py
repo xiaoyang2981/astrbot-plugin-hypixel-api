@@ -1,6 +1,8 @@
 import asyncio
 import aiohttp
 
+from .blitz import get_blitz_stats_from_player
+
 
 BASE_URL = "https://api.hypixel.net/v2"
 
@@ -125,21 +127,7 @@ class HypixelClient:
 
     async def get_blitz_stats(self, uuid: str | None = None, name: str | None = None) -> dict:
         player, display_name = await self._lookup_player(uuid=uuid, name=name)
-        s = player.get("stats", {}).get("Blitz", {})
-        return {
-            "display_name": display_name,
-            "coins": s.get("coins", 0),
-            "wins": s.get("wins", 0),
-            "kills": s.get("kills", 0),
-            "deaths": s.get("deaths", 0),
-            "games_played": s.get("games_played", 0),
-            "wins_teams": s.get("wins_teams", 0),
-            "kills_teams": s.get("kills_teams", 0),
-            "wins_solo": s.get("wins_solo", 0),
-            "kills_solo": s.get("kills_solo", 0),
-            "chests_opened": s.get("chests_opened", 0),
-            "time_played": s.get("time_played", 0),
-        }
+        return get_blitz_stats_from_player(player, display_name)
 
     async def get_player_rank_info(self, uuid: str | None = None, name: str | None = None) -> dict:
         player, display_name = await self._lookup_player(uuid=uuid, name=name)
