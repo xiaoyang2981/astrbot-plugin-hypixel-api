@@ -1,0 +1,6 @@
+name: astrbot_plugin_hypixel_api # 插件唯一识别名，以 astrbot_plugin_ 前缀开头
+display_name: Hypixel API # 用于展示的名字
+desc: Hypixel 玩家数据查询插件，支持玩家信息、BedWars、SkyWars 等游戏数据查询 # 插件简短描述
+version: v1.0.0 # 插件版本号
+author: AstrBot-Plugin-Dev # 作者
+repo: https://github.com/astrbot-plugin-hypixel-api # 插件的仓库地址
