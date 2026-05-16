@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif;background:#0d1117;color:#e6edf3;width:540px;padding:24px}
+.card{background:linear-gradient(135deg,#0d1117 0%,#1a120e 50%,#0d1117 100%);border-radius:14px;border:1px solid #30363d;padding:24px 28px}
+.header{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:2px solid #7ee787}
+.htitle{font-size:20px;font-weight:700;color:#7ee787}
+.hsub{font-size:13px;color:#8b949e;margin-top:1px}
+.tag{background:#7ee787;color:#0d1117;padding:3px 14px;border-radius:20px;font-size:13px;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.box{background:#1c2128;border-radius:10px;padding:12px;text-align:center}
+.lbl{font-size:11px;color:#8b949e}
+.gv{font-size:17px;font-weight:700;margin-top:3px}
+.green{color:#3fb950}.red{color:#f85149}.purple{color:#d2a8ff}.cyan{color:#58a6ff}
+.hl{background:#241a14;border-radius:10px;padding:14px;margin-top:10px;display:flex;justify-content:space-around}
+.hl-item{text-align:center}
+.hl-v{font-size:16px;font-weight:700;margin-top:2px}
+.info{margin-top:14px;padding-top:12px;border-top:1px solid #30363d}
+.info-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;color:#8b949e}
+.map-row{display:flex;justify-content:space-between;padding:4px 6px 4px 0;border-bottom:1px solid #21262d;font-size:12px;color:#8b949e}
+</style></head>
+<body>
+<div class="card">
+  <div class="header">
+    <div style="font-size:26px;line-height:1">🧟</div>
+    <div style="flex:1"><div class="htitle">丧尸末日</div><div class="hsub">{{ display_name }}</div></div>
+    <div class="tag">{{ games_played }} 场</div>
+  </div>
+  <div class="grid">
+    <div class="box"><div class="lbl">胜场</div><div class="gv green">{{ wins }}</div></div>
+    <div class="box"><div class="lbl">败场</div><div class="gv red">{{ losses }}</div></div>
+    <div class="box"><div class="lbl">击杀</div><div class="gv purple" style="font-size:15px">{{ kills }}</div></div>
+    <div class="box"><div class="lbl">死亡</div><div class="gv red" style="font-size:15px">{{ deaths }}</div></div>
+  </div>
+  <div class="hl">
+    <div class="hl-item"><div class="lbl">爆头</div><div class="hl-v purple">{{ headshots }}</div></div>
+    <div class="hl-item"><div class="lbl">开门</div><div class="hl-v cyan">{{ doors_opened }}</div></div>
+    <div class="hl-item"><div class="lbl">开箱</div><div class="hl-v cyan">{{ chests_looted }}</div></div>
+  </div>
+  <div class="info">
+    <div class="info-row"><span>总生存回合</span><span style="color:#3fb950;font-size:14px">{{ rounds_survived }}</span></div>
+    <div class="info-row" style="margin-bottom:8px"><span>最佳回合</span><span style="color:#d2a8ff;font-size:14px">{{ best_round }}</span></div>
+    {% for mname, mround in maps %}
+    <div class="map-row"><span>🗺️ {{ mname }}</span><span style="color:#e6edf3">最佳 {{ mround }} 回合</span></div>
+    {% endfor %}
+  </div>
+</div>
+</body>
+</html>
