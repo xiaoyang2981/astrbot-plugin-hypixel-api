@@ -143,3 +143,100 @@ class HypixelClient:
             "karma": player.get("karma", 0),
             "language": player.get("userLanguage", "ENGLISH"),
         }
+
+    async def _get_player_and_arcade(self, uuid=None, name=None) -> tuple[dict, dict, str]:
+        if uuid:
+            player_data = await self.get_player(uuid)
+        elif name:
+            player_data = await self.get_player_by_name(name)
+        else:
+            raise ValueError("uuid or name required")
+        player = player_data.get("player")
+        if not player:
+            raise Exception("Player not found")
+        arcade = player.get("stats", {}).get("Arcade", {})
+        display_name = player.get("displayname", "Unknown")
+        return player, arcade, display_name
+
+    async def get_arcade_stats(self, uuid: str | None = None, name: str | None = None) -> dict:
+        player, arcade, display_name = await self._get_player_and_arcade(uuid=uuid, name=name)
+
+        coins = player.get("achievements", {}).get("arcade_arcade_arcade", 0)
+        wins = arcade.get("wins", 0)
+        total_rounds = arcade.get("rounds_played", 0)
+
+        # collect per-game wins
+        game_wins = {}
+        for key, val in arcade.items():
+            if key.startswith("wins_"):
+                gname = key[5:]
+                game_wins[gname] = val
+
+        top_games = sorted(game_wins.items(), key=lambda x: x[1], reverse=True)[:5]
+
+        return {
+            "display_name": display_name,
+            "coins": coins,
+            "wins": wins,
+            "rounds_played": total_rounds,
+            "top_games": top_games,
+        }
+
+    async def get_zombies_stats(self, uuid: str | None = None, name: str | None = None) -> dict:
+        player, arcade, display_name = await self._get_player_and_arcade(uuid=uuid, name=name)
+
+        wins = arcade.get("zombie_wins", 0)
+        losses = arcade.get("zombie_losses", 0)
+        kills = arcade.get("zombie_kills", 0)
+        deaths = arcade.get("zombie_deaths", 0)
+        headshots = arcade.get("zombie_headshots", 0)
+        games = arcade.get("zombie_games_played", 0)
+        doors = arcade.get("zombie_doors_opened", 0)
+        chests = arcade.get("zombie_chests_looted", 0)
+        rounds_survived = arcade.get("zombie_total_rounds_survived", 0)
+        best_round = arcade.get("zombie_best_round", 0)
+
+        map_aliases = {
+            "zombie_dead_end_best_round": ("死胡同", "Dead End"),
+            "zombie_bad_blood_best_round": ("坏血", "Bad Blood"),
+            "zombie_alien_arcadium_best_round": ("异星方舟", "Alien Arcadium"),
+        }
+        maps = {}
+        for key, (cn, en) in map_aliases.items():
+            maps[cn] = arcade.get(key, 0)
+
+        return {
+            "display_name": display_name,
+            "wins": wins,
+            "losses": losses,
+            "kills": kills,
+            "deaths": deaths,
+            "headshots": headshots,
+            "games_played": games,
+            "doors_opened": doors,
+            "chests_looted": chests,
+            "rounds_survived": rounds_survived,
+            "best_round": best_round,
+            "maps": maps,
+        }
+
+    async def get_party_games_stats(self, uuid: str | None = None, name: str | None = None) -> dict:
+        player, arcade, display_name = await self._get_player_and_arcade(uuid=uuid, name=name)
+
+        round_wins = arcade.get("party_games_round_wins", 0)
+        total_rounds = arcade.get("party_games_total_rounds_played", 0)
+
+        mini_wins = {}
+        for key, val in arcade.items():
+            if key.startswith("party_games_wins_"):
+                gname = key[17:]
+                mini_wins[gname] = val
+
+        top_party = sorted(mini_wins.items(), key=lambda x: x[1], reverse=True)[:6]
+
+        return {
+            "display_name": display_name,
+            "round_wins": round_wins,
+            "total_rounds": total_rounds,
+            "mini_games": top_party,
+        }

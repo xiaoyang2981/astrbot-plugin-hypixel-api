@@ -6,7 +6,7 @@ from astrbot.api import logger, AstrBotConfig
 from astrbot.api.message_components import *
 
 from .hypixel_client import HypixelClient
-from .renderer import PLAYER_TMPL, BEDWARS_TMPL, SKYWARS_TMPL, get_initials
+from .renderer import PLAYER_TMPL, BEDWARS_TMPL, SKYWARS_TMPL, ARCADE_TMPL, ZOMBIES_TMPL, PARTY_TMPL, get_initials
 
 
 def calc_fkdr(final_kills: int, final_deaths: int) -> str:
@@ -75,12 +75,15 @@ class HypixelPlugin(Star):
 
         if len(parts) < 2:
             yield event.plain_result(
-                "Hypixel 查询插件\n\n"
+                "Hypixel 数据查询插件\n\n"
                 "用法:\n"
-                "  /hypixel player <游戏ID>  - 查看玩家基本信息\n"
-                "  /hypixel bedwars <游戏ID> - 查看 BedWars 数据\n"
-                "  /hypixel skywars <游戏ID> - 查看 SkyWars 数据\n"
-                "  /hypixel setkey <API密钥> - 设置 API Key"
+                "  /hypixel player <ID>   - 玩家基本信息\n"
+                "  /hypixel bedwars <ID>  - 起床战争数据\n"
+                "  /hypixel skywars <ID>  - 空岛战争数据\n"
+                "  /hypixel arcade <ID>   - 街机游戏总览\n"
+                "  /hypixel zombies <ID>  - 丧尸末日数据\n"
+                "  /hypixel party <ID>    - 小游戏派对数据\n"
+                "  /hypixel setkey <key>  - 设置 API Key"
             )
             return
 
@@ -118,6 +121,30 @@ class HypixelPlugin(Star):
                 yield event.plain_result("请输入玩家游戏ID: /hypixel skywars <ID>")
                 return
             async for result in self._handle_skywars(event, arg):
+                yield result
+            return
+
+        if sub == "arcade":
+            if not arg:
+                yield event.plain_result("请输入玩家游戏ID: /hypixel arcade <ID>")
+                return
+            async for result in self._handle_arcade(event, arg):
+                yield result
+            return
+
+        if sub == "zombies":
+            if not arg:
+                yield event.plain_result("请输入玩家游戏ID: /hypixel zombies <ID>")
+                return
+            async for result in self._handle_zombies(event, arg):
+                yield result
+            return
+
+        if sub == "party":
+            if not arg:
+                yield event.plain_result("请输入玩家游戏ID: /hypixel party <ID>")
+                return
+            async for result in self._handle_party(event, arg):
                 yield result
             return
 
@@ -166,8 +193,8 @@ class HypixelPlugin(Star):
         try:
             bw = await client.get_bedwars_stats(name=name)
         except Exception as e:
-            logger.error(f"获取 BedWars 数据失败: {e}")
-            yield event.plain_result(f"获取 BedWars 数据失败: {e}")
+            logger.error(f"获取起床战争数据失败: {e}")
+            yield event.plain_result(f"获取起床战争数据失败: {e}")
             return
 
         fkdr = calc_fkdr(bw["final_kills"], bw["final_deaths"])
@@ -205,8 +232,8 @@ class HypixelPlugin(Star):
         try:
             sw = await client.get_skywars_stats(name=name)
         except Exception as e:
-            logger.error(f"获取 SkyWars 数据失败: {e}")
-            yield event.plain_result(f"获取 SkyWars 数据失败: {e}")
+            logger.error(f"获取空岛战争数据失败: {e}")
+            yield event.plain_result(f"获取空岛战争数据失败: {e}")
             return
 
         kdr = calc_kdr(sw["kills"], sw["deaths"])
@@ -227,6 +254,95 @@ class HypixelPlugin(Star):
         }
         try:
             url = await self.html_render(SKYWARS_TMPL, data)
+            yield event.image_result(url)
+        except Exception as e:
+            logger.error(f"渲染图片失败: {e}")
+            yield event.plain_result("渲染图片失败，请检查 Playwright 是否正确安装。")
+
+    async def _handle_arcade(self, event: AstrMessageEvent, name: str):
+        client = self.client
+        if client is None:
+            yield event.plain_result("Hypixel API Key 未配置。请使用 /hypixel setkey <API密钥> 进行设置。")
+            return
+
+        try:
+            arc = await client.get_arcade_stats(name=name)
+        except Exception as e:
+            logger.error(f"获取街机数据失败: {e}")
+            yield event.plain_result(f"获取街机数据失败: {e}")
+            return
+
+        data = {
+            "display_name": arc["display_name"],
+            "wins": f"{arc['wins']:,}",
+            "rounds_played": f"{arc['rounds_played']:,}",
+            "coins": f"{arc['coins']:,}",
+            "top_games": arc["top_games"],
+        }
+        try:
+            url = await self.html_render(ARCADE_TMPL, data)
+            yield event.image_result(url)
+        except Exception as e:
+            logger.error(f"渲染图片失败: {e}")
+            yield event.plain_result("渲染图片失败，请检查 Playwright 是否正确安装。")
+
+    async def _handle_zombies(self, event: AstrMessageEvent, name: str):
+        client = self.client
+        if client is None:
+            yield event.plain_result("Hypixel API Key 未配置。请使用 /hypixel setkey <API密钥> 进行设置。")
+            return
+
+        try:
+            z = await client.get_zombies_stats(name=name)
+        except Exception as e:
+            logger.error(f"获取丧尸末日数据失败: {e}")
+            yield event.plain_result(f"获取丧尸末日数据失败: {e}")
+            return
+
+        maps_list = list(z["maps"].items())
+
+        data = {
+            "display_name": z["display_name"],
+            "wins": f"{z['wins']:,}",
+            "losses": f"{z['losses']:,}",
+            "kills": f"{z['kills']:,}",
+            "deaths": f"{z['deaths']:,}",
+            "headshots": f"{z['headshots']:,}",
+            "games_played": f"{z['games_played']:,}",
+            "doors_opened": f"{z['doors_opened']:,}",
+            "chests_looted": f"{z['chests_looted']:,}",
+            "rounds_survived": f"{z['rounds_survived']:,}",
+            "best_round": str(z["best_round"]),
+            "maps": maps_list,
+        }
+        try:
+            url = await self.html_render(ZOMBIES_TMPL, data)
+            yield event.image_result(url)
+        except Exception as e:
+            logger.error(f"渲染图片失败: {e}")
+            yield event.plain_result("渲染图片失败，请检查 Playwright 是否正确安装。")
+
+    async def _handle_party(self, event: AstrMessageEvent, name: str):
+        client = self.client
+        if client is None:
+            yield event.plain_result("Hypixel API Key 未配置。请使用 /hypixel setkey <API密钥> 进行设置。")
+            return
+
+        try:
+            p = await client.get_party_games_stats(name=name)
+        except Exception as e:
+            logger.error(f"获取小游戏派对数据失败: {e}")
+            yield event.plain_result(f"获取小游戏派对数据失败: {e}")
+            return
+
+        data = {
+            "display_name": p["display_name"],
+            "round_wins": f"{p['round_wins']:,}",
+            "total_rounds": f"{p['total_rounds']:,}",
+            "mini_games": p["mini_games"],
+        }
+        try:
+            url = await self.html_render(PARTY_TMPL, data)
             yield event.image_result(url)
         except Exception as e:
             logger.error(f"渲染图片失败: {e}")
