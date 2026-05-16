@@ -80,9 +80,8 @@ class HypixelPlugin(Star):
             self.client = None
             logger.warning("Hypixel API Key 未配置，请使用 /hypixel setkey <key> 设置")
 
-    async def _get_client(self, event: AstrMessageEvent) -> HypixelClient | None:
+    def _get_client(self, event: AstrMessageEvent) -> HypixelClient | None:
         if self.client is None:
-            yield event.plain_result("Hypixel API Key 未配置。请使用 /hypixel setkey <API密钥> 进行设置。")
             return None
         return self.client
 
