@@ -13,6 +13,7 @@ import commands.arcade as arcade_cmd
 import commands.zombies as zombies_cmd
 import commands.party as party_cmd
 import commands.bjd_blitz as blitz_cmd
+import commands.bjd_game as bjd_game_cmd
 
 
 @register("astrbot_plugin_hypixel_api", "bi_xiaoyang2", "Hypixel + BuGLand 数据查询插件", "1.0.0")
@@ -140,9 +141,12 @@ class HypixelPlugin(Star):
             yield event.plain_result(
                 "⚔️ BuGLand 布吉岛查询\n\n"
                 "📋 用法:\n"
-                "  ⚔️ /bjd blitz <ID>  - 布吉岛 Blitz 数据\n"
-                "  🔍 /bjd player <ID> - 布吉岛玩家信息\n"
-                "  🔑 /bjd setkey <key> - 设置 Token"
+                "  ⚔️ /bjd blitz <ID>    - 布吉岛 Blitz\n"
+                "  🛏️ /bjd bedwars <ID>  - 起床战争\n"
+                "  🌌 /bjd skywars <ID>  - 空岛战争\n"
+                "  🔍 /bjd player <ID>   - 玩家信息\n"
+                "  🔑 /bjd setkey <key>  - 设置 Token\n\n"
+                "💡 也支持 /bjd <game> <ID>，game 可以是: bedwars, skywars, blitz, thebridges, murder, arcade"
             )
             return
 
@@ -164,9 +168,7 @@ class HypixelPlugin(Star):
         self._log(event, sub, arg)
 
         try:
-            if sub == "blitz":
-                text = await blitz_cmd.handle(self.bjd, arg)
-            elif sub == "player":
+            if sub == "player":
                 data = await self.bjd.get_player(arg)
                 p = data.get("data", data)
                 text = (
@@ -178,7 +180,7 @@ class HypixelPlugin(Star):
                     f"🎮 游戏数 → {p.get('games', 0)}"
                 )
             else:
-                yield event.plain_result(f"未知命令: {sub}"); return
+                text = await bjd_game_cmd.handle(self.bjd, sub, arg)
             yield event.plain_result(text)
         except Exception as e:
             logger.info(f"BJD {sub} {arg} 失败: {e}")
