@@ -66,7 +66,7 @@ class HypixelPlugin(Star):
         if uid and str(uid) in bu: return True
         return False
 
-    async def _render(self, kind: str, data: dict, fallback: str):
+    async def _render(self, event: AstrMessageEvent, kind: str, data: dict, fallback: str):
         """渲染链路: html_render(远程T2I) → text_to_image(本地PIL) → 纯文本"""
         mode = self.config.get("render_mode", "auto")
         if mode == "text":
@@ -157,7 +157,7 @@ class HypixelPlugin(Star):
         fb = (f"玩家: {info['display_name']} Lv.{level}  Rank: {info.get('rank','NONE')}\n"
               f"UUID: {info['uuid']}\nKarma: {fmt_num(info.get('karma',0))}  语言: {info.get('language','N/A')}\n"
               f"首次登录: {ts_to_str(info.get('first_login',0))}\n最近活跃: {ts_to_str(info.get('last_login',0))}")
-        async for r in self._render("player", data, fb):
+        async for r in self._render(event, "player", data, fb):
             yield r
 
     async def _handle_bedwars(self, event, name):
@@ -185,7 +185,7 @@ class HypixelPlugin(Star):
               f"最终击杀: {fmt_num(bw['final_kills'])}  最终死亡: {fmt_num(bw['final_deaths'])}  FKDR: {fkdr}\n"
               f"拆床: {fmt_num(bw['beds_broken'])}  丢床: {fmt_num(bw['beds_lost'])}\n"
               f"连胜: {bw['winstreak']}  总场次: {fmt_num(bw['games_played'])}")
-        async for r in self._render("bedwars", data, fb):
+        async for r in self._render(event, "bedwars", data, fb):
             yield r
 
     async def _handle_skywars(self, event, name):
@@ -209,7 +209,7 @@ class HypixelPlugin(Star):
               f"击杀: {fmt_num(sw['kills'])}  死亡: {fmt_num(sw['deaths'])}  K/D: {kdr}\n"
               f"Souls: {fmt_num(sw['souls'])}  Heads: {fmt_num(sw['heads'])}\n"
               f"总场次: {fmt_num(sw['games_played'])}  硬币: {fmt_num(sw['coins'])}")
-        async for r in self._render("skywars", data, fb):
+        async for r in self._render(event, "skywars", data, fb):
             yield r
 
     async def _handle_arcade(self, event, name):
@@ -229,7 +229,7 @@ class HypixelPlugin(Star):
               f"总胜场: {fmt_num(arc['wins'])}  总回合: {fmt_num(arc['rounds_played'])}  硬币: {fmt_num(arc['coins'])}")
         if arc["top_games"]:
             fb += "\n热门小游戏:\n" + "\n".join(f"  {g}: {w}胜" for g, w in arc["top_games"][:5])
-        async for r in self._render("arcade", data, fb):
+        async for r in self._render(event, "arcade", data, fb):
             yield r
 
     async def _handle_zombies(self, event, name):
@@ -257,7 +257,7 @@ class HypixelPlugin(Star):
               f"生存回合: {fmt_num(z['rounds_survived'])}  最佳回合: {z['best_round']}")
         if z["maps"]:
             fb += "\n地图记录:\n" + "\n".join(f"  {m}: 最佳 {r} 回合" for m, r in z["maps"].items())
-        async for r in self._render("zombies", data, fb):
+        async for r in self._render(event, "zombies", data, fb):
             yield r
 
     async def _handle_party(self, event, name):
@@ -277,7 +277,7 @@ class HypixelPlugin(Star):
               f"回合胜场: {fmt_num(p['round_wins'])}  总回合: {fmt_num(p['total_rounds'])}")
         if p["mini_games"]:
             fb += "\n各小游戏胜场:\n" + "\n".join(f"  {g}: {w}" for g, w in p["mini_games"])
-        async for r in self._render("party", data, fb):
+        async for r in self._render(event, "party", data, fb):
             yield r
 
     async def terminate(self):
