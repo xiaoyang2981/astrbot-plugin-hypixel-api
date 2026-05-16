@@ -5,5 +5,24 @@
     "hint": "前往 https://developer.hypixel.net/ 获取",
     "obvious_hint": true,
     "default": ""
+  },
+  "render_mode": {
+    "description": "输出模式",
+    "type": "string",
+    "hint": "auto: 优先图片渲染，失败降级纯文本 | text: 始终纯文本输出",
+    "default": "auto",
+    "options": ["auto", "text"]
+  },
+  "ban_groups": {
+    "description": "黑名单群组（群号列表）",
+    "type": "list",
+    "hint": "被封禁的群将无法使用本插件，一行一个群号",
+    "default": []
+  },
+  "ban_users": {
+    "description": "黑名单用户（用户ID列表）",
+    "type": "list",
+    "hint": "被封禁的用户将无法使用本插件，一行一个用户ID",
+    "default": []
   }
 }
