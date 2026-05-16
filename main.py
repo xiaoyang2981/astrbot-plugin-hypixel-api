@@ -6,6 +6,7 @@ from astrbot.api import logger, AstrBotConfig
 from astrbot.api.message_components import *
 
 from .hypixel_client import HypixelClient
+from .renderer import PLAYER_TMPL, BEDWARS_TMPL, SKYWARS_TMPL, get_initials
 
 
 def calc_fkdr(final_kills: int, final_deaths: int) -> str:
@@ -137,17 +138,24 @@ class HypixelPlugin(Star):
 
         level = calc_star_from_exp(info.get("network_level", 0))
 
-        msg = (
-            f"玩家: {info['display_name']}\n"
-            f"UUID: {info['uuid']}\n"
-            f"等级: {info.get('rank', 'NONE')} (MVP++颜色: {info.get('mvp_plus_color', 'NONE')})\n"
-            f"网络等级: {level}\n"
-            f"Karma: {info.get('karma', 0):,}\n"
-            f"语言: {info.get('language', 'N/A')}\n"
-            f"首次登录: {ts_to_str(info.get('first_login', 0))}\n"
-            f"最近登录: {ts_to_str(info.get('last_login', 0))}\n"
-        )
-        yield event.plain_result(msg)
+        data = {
+            "initials": get_initials(info["display_name"]),
+            "display_name": info["display_name"],
+            "rank_display": info.get("rank", "NONE"),
+            "level": level,
+            "uuid": info["uuid"],
+            "language": info.get("language", "N/A"),
+            "karma": f"{info.get('karma', 0):,}",
+            "rank": info.get("rank", "NONE"),
+            "first_login": ts_to_str(info.get("first_login", 0)),
+            "last_login": ts_to_str(info.get("last_login", 0)),
+        }
+        try:
+            url = await self.html_render(PLAYER_TMPL, data)
+            yield event.image_result(url)
+        except Exception as e:
+            logger.error(f"渲染图片失败: {e}")
+            yield event.plain_result("渲染图片失败，请检查 Playwright 是否正确安装。")
 
     async def _handle_bedwars(self, event: AstrMessageEvent, name: str):
         client = self.client
@@ -166,21 +174,27 @@ class HypixelPlugin(Star):
         kdr = calc_kdr(bw["kills"], bw["deaths"])
         wlr = calc_wlr(bw["wins"], bw["losses"])
 
-        msg = (
-            f"BedWars - {bw['display_name']}\n"
-            f"等级 (Exp): {bw['level']:,}\n"
-            f"胜场: {bw['wins']:,}  |  败场: {bw['losses']:,}\n"
-            f"W/L: {wlr}\n"
-            f"总击杀: {bw['kills']:,}  总死亡: {bw['deaths']:,}\n"
-            f"K/D: {kdr}\n"
-            f"最终击杀: {bw['final_kills']:,}  最终死亡: {bw['final_deaths']:,}\n"
-            f"FKDR: {fkdr}\n"
-            f"拆床: {bw['beds_broken']:,}  丢床: {bw['beds_lost']:,}\n"
-            f"游戏场次: {bw['games_played']:,}\n"
-            f"连胜: {bw['winstreak']}\n"
-            f"硬币: {bw['coins']:,}\n"
-        )
-        yield event.plain_result(msg)
+        data = {
+            "display_name": bw["display_name"],
+            "level": f"{bw['level']:,}",
+            "wins": f"{bw['wins']:,}",
+            "losses": f"{bw['losses']:,}",
+            "final_kills": f"{bw['final_kills']:,}",
+            "final_deaths": f"{bw['final_deaths']:,}",
+            "fkdr": fkdr,
+            "kdr": kdr,
+            "wlr": wlr,
+            "beds_broken": f"{bw['beds_broken']:,}",
+            "beds_lost": f"{bw['beds_lost']:,}",
+            "winstreak": str(bw["winstreak"]),
+            "games_played": f"{bw['games_played']:,}",
+        }
+        try:
+            url = await self.html_render(BEDWARS_TMPL, data)
+            yield event.image_result(url)
+        except Exception as e:
+            logger.error(f"渲染图片失败: {e}")
+            yield event.plain_result("渲染图片失败，请检查 Playwright 是否正确安装。")
 
     async def _handle_skywars(self, event: AstrMessageEvent, name: str):
         client = self.client
@@ -198,19 +212,25 @@ class HypixelPlugin(Star):
         kdr = calc_kdr(sw["kills"], sw["deaths"])
         wlr = calc_wlr(sw["wins"], sw["losses"])
 
-        msg = (
-            f"SkyWars - {sw['display_name']}\n"
-            f"等级: {sw['level']}\n"
-            f"胜场: {sw['wins']:,}  败场: {sw['losses']:,}\n"
-            f"W/L: {wlr}\n"
-            f"击杀: {sw['kills']:,}  死亡: {sw['deaths']:,}\n"
-            f"K/D: {kdr}\n"
-            f"游戏场次: {sw['games_played']:,}\n"
-            f"Souls: {sw['souls']:,}\n"
-            f"硬币: {sw['coins']:,}\n"
-            f"Heads: {sw['heads']:,}\n"
-        )
-        yield event.plain_result(msg)
+        data = {
+            "display_name": sw["display_name"],
+            "level": sw["level"],
+            "wins": f"{sw['wins']:,}",
+            "losses": f"{sw['losses']:,}",
+            "kills": f"{sw['kills']:,}",
+            "deaths": f"{sw['deaths']:,}",
+            "kdr": kdr,
+            "wlr": wlr,
+            "souls": f"{sw['souls']:,}",
+            "games_played": f"{sw['games_played']:,}",
+            "heads": f"{sw['heads']:,}",
+        }
+        try:
+            url = await self.html_render(SKYWARS_TMPL, data)
+            yield event.image_result(url)
+        except Exception as e:
+            logger.error(f"渲染图片失败: {e}")
+            yield event.plain_result("渲染图片失败，请检查 Playwright 是否正确安装。")
 
     async def terminate(self):
         if hasattr(self, "client") and self.client:
