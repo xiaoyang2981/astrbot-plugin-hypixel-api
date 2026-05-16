@@ -1,0 +1,10 @@
+━━━━ 小游戏派对 ━━━━
+
+  {display_name}
+
+━━━━━━━━━━━━━━━━
+
+  回合胜场  │ {round_wins}
+  总回合    │ {total_rounds}
+
+{mini_games_text}
